@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style type="text/css">
+      #map { 
+            height: 300px;    
+            width: 100%;            
+          }   
+    </style>
+    <title>Hello, world!</title>
+  </head>
+  <body>
+    <div class="jumbotron">
+      <h3 class="text-center display-4">Hello, world!</h3>
+    </div>    
+    <div class="container"> 
+
+      <div class="row">
+        <div class="col-md-6">
+          <select class="form-control">
+            <option>Planta 1</option>
+            <option>Planta 2</option>
+            <option>Planta 3</option>
+            <option>Planta 4</option>
+            <option>Planta 5</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <img src="https://cms.splendidtable.org/sites/default/files/styles/w2000/public/italycorn_0.jpg?itok=TtUl26TV" id="img-plant" class="img-fluid rounded">
+        </div>
+      </div>
+
+    <br>
+      <hr>
+      <br>
+
+      <div class="row">
+        <div class="col-md-6">
+          <form>
+            
+            <div class="form-row">
+              <div class="col">
+                <label>Latitude</label>
+                <input type="text" id="lat" disabled="disabled" class="form-control" name="plant">
+              </div>
+
+              <div class="col">
+                <label>Latitude</label>
+                <input type="text" id="lat" disabled="disabled" class="form-control" name="plant">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="col">
+                <label>Latitude</label>
+                <input type="text" id="lat" disabled="disabled" class="form-control" name="plant">
+              </div>
+
+              <div class="col">
+                <label>Latitude</label>
+                <input type="text" id="lat" disabled="disabled" class="form-control" name="plant">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="col">
+                <label>Latitude</label>
+                <input type="text" id="lat" disabled="disabled" class="form-control" name="plant">
+              </div>
+
+              <div class="col">
+                <label>Latitude</label>
+                <input type="text" id="lat" disabled="disabled" class="form-control" name="plant">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="col">
+                <label>Latitude</label>
+                <input type="text" id="lat" disabled="disabled" class="form-control" name="plant">
+              </div>
+
+              <div class="col">
+                <label>Latitude</label>
+                <input type="text" id="lat" disabled="disabled" class="form-control" name="plant">
+              </div>
+            </div>
+
+
+          </form>
+        </div>
+        <div class="col-md-6 float-right">
+          <div id="map"></div>
+        </div>
+      </div>
+  
+      
+
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+      
+      $(document).ready(function() {
+        $.get("http://localhost/plantas", function(data, status){
+          // @todo
+        }); 
+      });
+    </script>
+
+    <script type="text/javascript">
+      let map;
+      let markers = [];
+
+      function initMap() {      
+        //Seta a latitude e longitude correspondente a Brasília                      
+        let latitude  = -15.7941; 
+        let longitude = -47.8825; 
+        
+        //Cria um objeto
+        let myLatLng = {lat: latitude, lng: longitude};
+        
+        // Cria o mapa, informando a localização
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: myLatLng,
+          zoom: 10,
+          disableDoubleClickZoom: true, // disable the default map zoom on double click
+        });
+        
+        // Cria um novo marcador em um evento "double-click" no mapa
+        google.maps.event.addListener(map,'dblclick',function(event) {
+
+            //Limpa todos os marcadores na tela
+            clearMarkers();
+
+            //Pega a longitude e a latitude clicadas
+            let $lat = event.latLng.lat();
+            let $lng = event.latLng.lng();
+
+            // Cria um objeto
+            let $latLng = {lat: $lat, lng: $lng}
+
+            //Cria um objeto geocoeder para conseguir fazer um efeito reverso
+            //Informando a latitude e longitude, é possível conseguir o endereço completo
+            let geocoder = new google.maps.Geocoder;
+
+            //Pega o endereço completo
+            let $title = getAdressFromLatLng(geocoder, $latLng);
+            
+            // Aqui é onde ocorre a criação de fato do marcador
+            let marker = new google.maps.Marker({
+              position: event.latLng, 
+              map: map, 
+              title: $title 
+            });
+
+            //Adiciona o marcador criado na lista de marcadores
+            markers.push(marker);
+
+            // Após adicionar o marcador no mapa, faz uma requisição ajax para conseguir os dados de clima referentes à localização
+            $.ajax({
+              type: "POST",
+              url: "http://localhost/localisacao",
+              data: $latLng
+            })
+            .done(function (response) {
+              // @todo
+            });
+        });
+      }
+
+      //Remove os marcadores do mapa
+      function clearMarkers() {
+        for (let i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+        }
+        markers = [];
+      }
+
+      //Retorna o endereço completo a partir de uma latitude e uma longitude
+      function getAdressFromLatLng(geocoder, $latLng) {
+        let title = geocoder.geocode({'location': $latLng}, function(results, status) {
+          if (status === 'OK') {
+            return results[0].formatted_address;
+          }          
+        });
+
+        return title;
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSs9UdG-KNokrrRxgj6_nGChEyAWfvkHA&callback=initMap" async defer></script>
+  </body>
+</html>
